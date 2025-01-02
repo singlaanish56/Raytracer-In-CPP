@@ -11,5 +11,5 @@ cmake build
 
 run using
 ```
-build/src/Debug/MyRayTracer.cpp
+build/src/Debug/MyRayTracer.exe
 ```
