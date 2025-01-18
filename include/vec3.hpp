@@ -46,6 +46,13 @@ class vec3{
             return std::sqrt(lengthsqaured());
         }
 
+        static vec3 random(){
+            return vec3(randomDouble(),randomDouble(),randomDouble());
+        }
+
+        static vec3 random(double min, double max){
+            return vec3(randomDouble(min, max),randomDouble(min, max),randomDouble(min, max));
+        }
 
 };
 
@@ -97,4 +104,26 @@ inline vec3 cross(const vec3&  u, const vec3& v)
 
 inline vec3 unit_vector(const vec3& v){
     return v / v.length();
+}
+
+inline vec3  randomUnitVector(){
+    while(true){
+        // a random point in the square
+        auto p = vec3::random(-1,1);
+        auto len = p.lengthsqaured();
+        if(len > 1e-160 && len<=1){
+            return p/sqrt(len);
+        }
+    }
+}
+
+inline vec3 randomOnHemisphere(const vec3& normal){
+    vec3 randomUnitSphere = randomUnitVector();
+    //if the dot product is in the same direction, return it
+    if(dot(randomUnitSphere, normal) > 0.0){
+        return randomUnitSphere;
+    }
+
+    //else change the direction
+    return -randomUnitSphere;
 }

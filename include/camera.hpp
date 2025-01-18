@@ -55,11 +55,17 @@ private:
         return vec3(randomDouble() -0.5 ,  randomDouble() - 0.5, 0);
     }
 
-    color rayColor(const ray& r, const hittable& world){
+    color rayColor(const ray& r, int depth, const hittable& world){
+        if(depth<=0)
+            return color(0,0,0);
+        
         hitrecord rec;
 
-        if (world.hit(r,interval(0, infinity), rec)){
-            return 0.5  * (rec.normal + color(1,1,1));
+        // the non zero min in the interval is to  deal with a closer to just below the surface, which
+        //could change the surface color again.
+        if (world.hit(r,interval(0.001, infinity), rec)){
+            vec3 direction = randomOnHemisphere(rec.normal);
+            return 0.5  * rayColor(ray(rec.p, direction),depth-1, world);
         }
 
         vec3 unit_direction  = unit_vector(r.direction());
@@ -71,7 +77,7 @@ public :
     double aspectRatio = 1.0;
     int imageWidth = 100;
     int samplePerPixel = 10;
-
+    int maxDepth=10;// max number of recursive calls for the rayColor functions
     void render(const hittable& world){
         initialize();
 
@@ -83,7 +89,7 @@ public :
                color pixelColor(0,0,0);
                 for(int sample = 0 ; sample<samplePerPixel;sample++){
                     ray r = getRay(i,j);
-                    pixelColor += rayColor(r, world);
+                    pixelColor += rayColor(r, maxDepth, world);
                 }
 
 
