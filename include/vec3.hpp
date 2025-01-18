@@ -111,7 +111,7 @@ inline vec3  randomUnitVector(){
         // a random point in the square
         auto p = vec3::random(-1,1);
         auto len = p.lengthsqaured();
-        if(len > 1e-160 && len<=1){
+        if(len > 1e-160 && len<=1.0){
             return p/sqrt(len);
         }
     }
@@ -122,8 +122,10 @@ inline vec3 randomOnHemisphere(const vec3& normal){
     //if the dot product is in the same direction, return it
     if(dot(randomUnitSphere, normal) > 0.0){
         return randomUnitSphere;
+    }else{
+        //else change the direction
+        return -randomUnitSphere;
     }
 
-    //else change the direction
-    return -randomUnitSphere;
+
 }

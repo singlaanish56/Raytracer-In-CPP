@@ -65,7 +65,7 @@ private:
         //could change the surface color again.
         if (world.hit(r,interval(0.001, infinity), rec)){
             vec3 direction = randomOnHemisphere(rec.normal);
-            return 0.5  * rayColor(ray(rec.p, direction),depth-1, world);
+            return 0.7 * rayColor(ray(rec.p, direction),depth-1, world);
         }
 
         vec3 unit_direction  = unit_vector(r.direction());
