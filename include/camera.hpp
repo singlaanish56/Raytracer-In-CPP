@@ -8,12 +8,16 @@ private:
     point3  pixel100loc;
     vec3 pixelDeltaU;
     vec3 pixelDeltaV;
+    double pixelSampleScale;
 
     void initialize(){
 
     //calculate the height, depending on the width
     imageHeight =int(imageWidth / aspectRatio);
     imageHeight = imageHeight <1 ? 1 : imageHeight;
+
+    //antialiasing
+    pixelSampleScale  = 1.0 / samplePerPixel;
 
     //camera
     auto focalLength = 1.0;
@@ -34,6 +38,23 @@ private:
     pixel100loc = viewportUpperLeft + 0.5 *( pixelDeltaU+pixelDeltaV);
     }
 
+    ray getRay(int i,int j) const{
+        // offsetting the ray by bit, changing where the ray hits in the pixel for around the pixel.
+        
+        auto offset = sampleSquare();
+        auto pixelSample  = pixel100loc + ((i+ offset.x()) * pixelDeltaU) + ((j+offset.y())* pixelDeltaV);
+
+        auto rayOrigin = center;
+        auto rayDirection = pixelSample - rayOrigin;
+
+        return ray(rayOrigin, rayDirection);
+    }
+
+    vec3 sampleSquare() const {
+        //get a random point between [-.5, -.5] [+.5,+.5] unit sqaure.
+        return vec3(randomDouble() -0.5 ,  randomDouble() - 0.5, 0);
+    }
+
     color rayColor(const ray& r, const hittable& world){
         hitrecord rec;
 
@@ -49,7 +70,8 @@ private:
 public :
     double aspectRatio = 1.0;
     int imageWidth = 100;
-    
+    int samplePerPixel = 10;
+
     void render(const hittable& world){
         initialize();
 
@@ -58,13 +80,14 @@ public :
         for(int j=0;j<imageHeight;j++){
             std::clog<<"\rScanline remaining: " <<(imageHeight-j) << ' '<<std::flush;
             for(int i=0;i<imageWidth;i++){
-                auto pixelCenter = pixel100loc + (i* pixelDeltaU) + (j * pixelDeltaV);
-                auto rayDirection =  pixelCenter - center;
+               color pixelColor(0,0,0);
+                for(int sample = 0 ; sample<samplePerPixel;sample++){
+                    ray r = getRay(i,j);
+                    pixelColor += rayColor(r, world);
+                }
 
-                ray r ( center, rayDirection);
-                color pixelColor = rayColor(r, world);
 
-                write_color(std::cout, pixelColor); 
+                write_color(std::cout, pixelSampleScale  * pixelColor); 
             }
         }
 
