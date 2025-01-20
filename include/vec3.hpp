@@ -115,8 +115,8 @@ inline vec3  randomUnitVector(){
         // a random point in the square
         auto p = vec3::random(-1,1);
         auto len = p.lengthsqaured();
-        if(len > 1e-160 && len<=1.0){
-            return p/sqrt(len);
+        if(len <= 1){
+            return (p / std::sqrt(len));
         }
     }
 }
