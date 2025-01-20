@@ -54,6 +54,10 @@ class vec3{
             return vec3(randomDouble(min, max),randomDouble(min, max),randomDouble(min, max));
         }
 
+        bool nearZero() const{
+            auto s = 1e-8;
+            return ((std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) < s));
+        }
 };
 
 using point3 = vec3;
@@ -126,6 +130,20 @@ inline vec3 randomOnHemisphere(const vec3& normal){
         //else change the direction
         return -randomUnitSphere;
     }
-
-
 }
+// so this caluclated how the ray is reflected.
+// let say v is the incoming ray and n is the surface noraml.
+//v can be divided into two rays, one parallet to the surface, one  parallet to the normal.
+// to find the second one we can do v.n cos(theta), now to scale it along the normal multiply with n
+// let this be b = dot(v,n) * n
+// to calculate the first part (parralel to the surface) = v-b;
+
+// now to get the reflected ray from the metal surface, this is shoudld be the addition of both the parts (b should be direction of the normal)
+// reflected ray = (v-b)+(-b) = v-2b = v- 2* dot(v,n)*n;
+inline vec3 reflect(const vec3& v, const vec3& n){
+    return v - 2*dot(v,n)*n;
+}
+
+
+
+

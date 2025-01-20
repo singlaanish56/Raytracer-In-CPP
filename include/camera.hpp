@@ -1,6 +1,8 @@
 #pragma once
 
 #include "hittable.hpp"
+#include "material.hpp"
+
 class camera{
 private:
     int imageHeight;
@@ -64,8 +66,13 @@ private:
         // the non zero min in the interval is to  deal with a closer to just below the surface, which
         //could change the surface color again.
         if (world.hit(r,interval(0.001, infinity), rec)){
-            vec3 direction = randomOnHemisphere(rec.normal);
-            return 0.7 * rayColor(ray(rec.p, direction),depth-1, world);
+            ray scattered;
+            color attenuation;
+            if(rec.mat->scatter(r, rec, attenuation, scattered)){
+                return attenuation * rayColor(scattered, depth-1, world);
+            }
+
+            return color(0,0,0);
         }
 
         vec3 unit_direction  = unit_vector(r.direction());

@@ -2,12 +2,14 @@
 
 #include "regularIncludes.hpp"
 
+class material;
 
 // just tell the point of hit and the normal at the piont
 class hitrecord{
 public:
     point3 p;
     vec3 normal;
+    std::shared_ptr<material> mat;
     double t;
     bool frontface;
 
