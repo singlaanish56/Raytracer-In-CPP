@@ -145,5 +145,13 @@ inline vec3 reflect(const vec3& v, const vec3& n){
 }
 
 
+//read more about refraction here
+//https://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf
+inline vec3 refract(const vec3& uv, const vec3& n, double refractiveIndex){
+auto cosTheta = std::fmin(dot(-uv,n), 1.0);
+vec3 rperpendicular = refractiveIndex * (uv + cosTheta*n);
+vec3 rparrallel = -std::sqrt(std::fabs(1.0-rperpendicular.lengthsqaured())) * n;
 
+return rperpendicular + rparrallel;
+}
 

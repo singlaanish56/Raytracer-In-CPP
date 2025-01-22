@@ -51,3 +51,42 @@ bool scatter(const ray& r, const hitrecord& rec, color& attenuation, ray& scatte
     return dot(scattered.direction(), rec.normal) > 0;
 }
 };
+
+
+class dielectric : public material{
+private:
+//ratio of material ri over the ri of the enclosing area
+double refractiveIndex;
+
+static double schlickReflectance(double cos, double refractionIndex){
+auto r0 = (1-refractionIndex) / (1+refractionIndex);
+r0=r0*r0;
+return r0 + (1-r0)*std::pow((1-cos),5);
+}
+
+public:
+dielectric(double refractiveIndex):refractiveIndex(refractiveIndex){}
+
+bool scatter(const ray& r, const hitrecord& rec, color& attenuation, ray& scattered) const override{
+    attenuation = color(1.0,1.0,1.0);
+    double rindex = rec.frontface ? (1.9/refractiveIndex) : refractiveIndex;
+
+    vec3 unitDirection = unit_vector(r.direction());
+    double cosTheta = std::fmin(dot(-unitDirection, rec.normal), 1.0);
+    double sinTheta  = std::sqrt(1.0-cosTheta*cosTheta);
+    
+    //total internal reflection, read about the paper in the refract func in  vec3
+    bool cannotRefract = rindex * sinTheta > 1.0;
+    vec3 direction;
+    if(cannotRefract || schlickReflectance(cosTheta, rindex) > randomDouble()){
+        direction = reflect(unitDirection, rec.normal);
+    }else{
+        direction = refract(unitDirection, rec.normal, rindex);
+    }
+    
+
+    scattered = ray(rec.p, direction);
+
+    return true;
+}
+};
