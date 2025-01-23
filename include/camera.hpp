@@ -11,6 +11,9 @@ private:
     vec3 pixelDeltaU;
     vec3 pixelDeltaV;
     double pixelSampleScale;
+    vec3 u, v ,w;
+    vec3 defocusDiskU;
+    vec3 defocusDiskV;
 
     void initialize(){
 
@@ -22,22 +25,34 @@ private:
     pixelSampleScale  = 1.0 / samplePerPixel;
 
     //camera
-    auto focalLength = 1.0;
-    center = point3(0,0,0);
+    center = lookFrom;
+
+    auto focalLength = (lookFrom - lookAt).length();
+    auto theta = degreeToRadians(fieldOfView);
+    auto h = std::tan(theta/2);
+    
+    w = unit_vector(lookFrom-lookAt);
+    u = unit_vector(cross(vup, w));
+    v = cross(w, u);
 
     //viewport
-    auto viewportHeight = 2.0;
+    auto viewportHeight = 2 * h * focusDist;
     auto viewportWidth = viewportHeight * (double(imageWidth/imageHeight));
-    auto viewportU = vec3(viewportWidth ,0 ,0);
-    auto viewportV = vec3(0, -viewportHeight, 0);
+    auto viewportU = viewportWidth * u;
+    auto viewportV = viewportHeight * -v;
     pixelDeltaU =  viewportU / imageWidth;
     pixelDeltaV = viewportV / imageHeight; 
 
     //the upper left location of the pixel on the viewport
-    auto viewportUpperLeft = center - vec3(0,0,focalLength) - viewportU/2 - viewportV/2;
+    auto viewportUpperLeft = center - (focusDist * w) - viewportU/2 - viewportV/2;
 
     // shift the left mopst point to coincide with the center
     pixel100loc = viewportUpperLeft + 0.5 *( pixelDeltaU+pixelDeltaV);
+
+    auto defocusRadius = focusDist * std::tan(degreeToRadians(deFocusAngle/2));
+    defocusDiskU = u * defocusRadius;
+    defocusDiskV = v * defocusDiskV;
+
     }
 
     ray getRay(int i,int j) const{
@@ -46,10 +61,15 @@ private:
         auto offset = sampleSquare();
         auto pixelSample  = pixel100loc + ((i+ offset.x()) * pixelDeltaU) + ((j+offset.y())* pixelDeltaV);
 
-        auto rayOrigin = center;
+        auto rayOrigin = (deFocusAngle<=0)?center: defocusDiskSample();
         auto rayDirection = pixelSample - rayOrigin;
 
         return ray(rayOrigin, rayDirection);
+    }
+
+    point3 defocusDiskSample() const {
+        auto p = randomUnitDisk();
+        return center + (p[0] * defocusDiskU) + (p[1] * defocusDiskV);
     }
 
     vec3 sampleSquare() const {
@@ -85,6 +105,15 @@ public :
     int imageWidth = 100;
     int samplePerPixel = 10;
     int maxDepth=10;// max number of recursive calls for the rayColor functions
+
+    double fieldOfView = 90;
+    point3 lookFrom =  point3(0,0,0);
+    point3 lookAt = point3(0,0,-1);
+    vec3 vup = vec3(0,1,0);
+    
+    double deFocusAngle = 0;
+    double focusDist = 10;
+
     void render(const hittable& world){
         initialize();
 

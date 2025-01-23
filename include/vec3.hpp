@@ -121,6 +121,16 @@ inline vec3  randomUnitVector(){
     }
 }
 
+inline vec3 randomUnitDisk(){
+    while (true)
+    {
+        auto p = vec3(randomDouble(-1,1), randomDouble(-1,1), 0);
+        if(p.lengthsqaured() < 1)
+            return p;
+    }
+    
+}
+
 inline vec3 randomOnHemisphere(const vec3& normal){
     vec3 randomUnitSphere = randomUnitVector();
     //if the dot product is in the same direction, return it
