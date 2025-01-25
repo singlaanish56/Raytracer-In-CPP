@@ -14,9 +14,7 @@ inline double degreeToRadians(double deegrees){
 }
 
 inline double randomDouble(){
-    static  std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    static std::mt19937 generator;
-    return distribution(generator);
+   return std::rand() / (RAND_MAX + 1.0);
 }
 
 inline double randomDouble(double min, double max){

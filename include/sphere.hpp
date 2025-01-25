@@ -37,7 +37,6 @@ bool hit(const ray&r , interval rayt, hitrecord&  rec) const override{
 
     rec.t = root;
     rec.p  =  r.at(rec.t);
-    rec.normal = (rec.p - center) / radius;
     vec3 outwarNormal = (rec.p-center) / a;
     rec.setFrontFace(r, outwarNormal);
     rec.mat = mat;

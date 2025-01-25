@@ -2,7 +2,7 @@
 
 
 class vec3{
-    private:
+    public:
         double e[3];
     public:
         vec3() : e{0,0,0}{}
@@ -17,9 +17,9 @@ class vec3{
         double& operator[](int i ) {return e[i];}
 
         vec3& operator+=(const vec3& v){
-            e[0]+=v.x();
-            e[1]+=v.y();
-            e[2]+=v.z();
+            e[0]+=v.e[0];
+            e[1]+=v.e[1];
+            e[2]+=v.e[2];
 
             return *this;
         }
@@ -64,31 +64,26 @@ using point3 = vec3;
 
 inline std::ostream& operator<<(std::ostream& out, const vec3& v)
 {
-    return out<< v.x() << ' '<< v.y() << ' '<< v.z();
+    return out<< v.e[0] << ' '<< v.e[1] << ' '<< v.e[2];
 }
 
-inline vec3 operator+(const vec3&  u, const vec3& v)
-{
-    return vec3{u.x()+v.x(),u.y()+v.y(),u.z()+v.z()};
+inline vec3 operator+(const vec3& u, const vec3& v) {
+    return vec3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
 }
 
-inline vec3 operator-(const vec3&  u, const vec3& v)
-{
-    return vec3{u.x()-v.x(),u.y()-v.y(),u.z()-v.z()};
+inline vec3 operator-(const vec3& u, const vec3& v) {
+    return vec3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
 }
 
-inline vec3 operator*(const vec3&  u, const vec3& v)
-{
-    return vec3{u.x()*v.x(),u.y()*v.y(),u.z()*v.z()};
+inline vec3 operator*(const vec3& u, const vec3& v) {
+    return vec3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]);
 }
 
-inline vec3 operator*(double t, const vec3& v)
-{
-    return vec3{t*v.x(),t*v.y(),t*v.z()};
+inline vec3 operator*(double t, const vec3& v) {
+    return vec3(t*v.e[0], t*v.e[1], t*v.e[2]);
 }
 
-inline vec3 operator*(const vec3& v, double t)
-{
+inline vec3 operator*(const vec3& v, double t) {
     return t * v;
 }
 
@@ -96,14 +91,16 @@ inline vec3 operator/(const vec3&v, double t){
     return (1/t) * v;
 }
 
-inline double dot(const vec3&  u, const vec3& v)
-{
-    return (u.x()*v.x()+u.y()*v.y()+u.z()*v.z());
+inline double dot(const vec3& u, const vec3& v) {
+    return u.e[0] * v.e[0]
+         + u.e[1] * v.e[1]
+         + u.e[2] * v.e[2];
 }
 
-inline vec3 cross(const vec3&  u, const vec3& v)
-{
-    return vec3(u.y()*v.z() - u.z()*v.y(), u.z()*v.x()-u.x()*v.z(), u.x()*v.y()-u.y()*v.x());
+inline vec3 cross(const vec3& u, const vec3& v) {
+    return vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
+                u.e[2] * v.e[0] - u.e[0] * v.e[2],
+                u.e[0] * v.e[1] - u.e[1] * v.e[0]);
 }
 
 inline vec3 unit_vector(const vec3& v){
@@ -115,9 +112,8 @@ inline vec3  randomUnitVector(){
         // a random point in the square
         auto p = vec3::random(-1,1);
         auto len = p.lengthsqaured();
-        if(len <= 1){
-            return (p / std::sqrt(len));
-        }
+        if (1e-160 < len && len <= 1.0)
+            return p / sqrt(len);
     }
 }
 

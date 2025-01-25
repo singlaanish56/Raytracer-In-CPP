@@ -12,7 +12,7 @@ class interval{
     }
 
     bool contains(const double r){
-        return (r<=max && r>=min);
+        return (min<=r && r<=max);
     }
 
     bool surrounds(const double r){

@@ -27,7 +27,6 @@ private:
     //camera
     center = lookFrom;
 
-    auto focalLength = (lookFrom - lookAt).length();
     auto theta = degreeToRadians(fieldOfView);
     auto h = std::tan(theta/2);
     
@@ -37,7 +36,7 @@ private:
 
     //viewport
     auto viewportHeight = 2 * h * focusDist;
-    auto viewportWidth = viewportHeight * (double(imageWidth/imageHeight));
+    auto viewportWidth = viewportHeight * (double(imageWidth)/imageHeight);
     auto viewportU = viewportWidth * u;
     auto viewportV = viewportHeight * -v;
     pixelDeltaU =  viewportU / imageWidth;
